@@ -4,4 +4,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def home(request):
-    return HttpResponse('Hi')
+    return HttpResponse('home')
+
+def products(request):
+    return HttpResponse('Products')
+
+def customer(request):
+    return HttpResponse('customer')
