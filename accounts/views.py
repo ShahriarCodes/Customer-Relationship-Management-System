@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import *
 
-from .forms import OrderForm
+from .forms import OrderForm, CustomerForm, ProductForm
 
 # Create your views here.
 
@@ -64,3 +64,29 @@ def updateOrder(request, pk):
 
     context = {'form': form}
     return render(request, 'accounts/order_form.html', context)
+
+def createCustomer(request):
+    form = CustomerForm()
+
+    if request.method == 'POST':
+        # print('Printing post: ', request.POST)
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form': form}
+    return render(request, 'accounts/customer_form.html', context)
+
+def createProduct(request):
+    form = ProductForm()
+
+    if request.method == 'POST':
+        # print('Printing post: ', request.POST)
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form': form}
+    return render(request, 'accounts/product_form.html', context)
