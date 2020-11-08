@@ -2,11 +2,15 @@
 
 {% block content %}
 
-  <form action="" method="POST">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" name="Submit" value="Submit">
+  <div class="container">
+    <form action="" method="POST">
+      {% csrf_token %}
+      {% for form in formset %}
+        {{ form }} <br> <br>
+      {% endfor %}
+      <button class="btn btn-primary" type="submit">Submit</button>
 
-  </form>
+    </form>
+  </div>
 
 {% endblock content %}
