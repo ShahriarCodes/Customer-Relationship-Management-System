@@ -19,7 +19,6 @@ def home(request):
 
     total_customers = customers.count()
 
-
     context = {
                 'orders': orders,
                 'customers': customers,
@@ -62,11 +61,18 @@ def createOrder(request):
     return render(request, 'accounts/order_form.html', context)
 
 def createOrderById(request, pk):
-    OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'))
+    # use 'extra' for as many fields as required
+    OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=5)
 
     customer = Customer.objects.get(id=pk)
+
+    ## in case of using new fields and also placed orders
     formset = OrderFormSet(instance = customer)
-    # form = OrderForm(initial={'customer': customer})
+
+    ## in case of using only new fields
+    # formset = OrderFormSet(queryset=Order.objects.none(), instance = customer)
+
+    ## form = OrderForm(initial={'customer': customer})
 
     if request.method == 'POST':
         # print('Printing post: ', request.POST)
@@ -78,9 +84,6 @@ def createOrderById(request, pk):
 
     context = {'formset': formset}
     return render(request, 'accounts/order_form_by_id.html', context)
-
-
-
 
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
