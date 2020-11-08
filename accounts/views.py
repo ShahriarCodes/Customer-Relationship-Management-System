@@ -58,6 +58,23 @@ def createOrder(request):
     context = {'form': form}
     return render(request, 'accounts/order_form.html', context)
 
+def createOrderById(request, pk):
+    customer = Customer.objects.get(id=pk)
+    form = OrderForm(initial={'customer': customer})
+
+    if request.method == 'POST':
+        # print('Printing post: ', request.POST)
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/customer/'+ str(pk))
+
+    context = {'form': form}
+    return render(request, 'accounts/order_form_by_id.html', context)
+
+
+
+
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
