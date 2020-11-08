@@ -67,10 +67,10 @@ def createOrderById(request, pk):
     customer = Customer.objects.get(id=pk)
 
     ## in case of using new fields and also placed orders
-    formset = OrderFormSet(instance = customer)
+    # formset = OrderFormSet(instance = customer)
 
     ## in case of using only new fields
-    # formset = OrderFormSet(queryset=Order.objects.none(), instance = customer)
+    formset = OrderFormSet(queryset=Order.objects.none(), instance = customer)
 
     ## form = OrderForm(initial={'customer': customer})
 
