@@ -4,6 +4,9 @@ from .models import *
 
 from .forms import OrderForm, CustomerForm, ProductForm
 
+# for creating multiple orders
+from django.forms import inlineformset_factory
+
 # Create your views here.
 
 def home(request):
@@ -15,7 +18,6 @@ def home(request):
     pending = orders.filter(status = 'Pending').count()
 
     total_customers = customers.count()
-
 
     context = {
                 'orders': orders,
@@ -57,6 +59,31 @@ def createOrder(request):
 
     context = {'form': form}
     return render(request, 'accounts/order_form.html', context)
+
+def createOrderById(request, pk):
+    # use 'extra' for as many fields as required
+    OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=5)
+
+    customer = Customer.objects.get(id=pk)
+
+    ## in case of using new fields and also placed orders
+    # formset = OrderFormSet(instance = customer)
+
+    ## in case of using only new fields
+    formset = OrderFormSet(queryset=Order.objects.none(), instance = customer)
+
+    ## form = OrderForm(initial={'customer': customer})
+
+    if request.method == 'POST':
+        # print('Printing post: ', request.POST)
+        # form = OrderForm(request.POST)
+        formset = OrderFormSet(request.POST, instance = customer)
+        if formset.is_valid():
+            formset.save()
+            return redirect('/customer/'+ str(pk))
+
+    context = {'formset': formset}
+    return render(request, 'accounts/order_form_by_id.html', context)
 
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
