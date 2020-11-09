@@ -7,6 +7,9 @@ from .forms import OrderForm, CustomerForm, ProductForm
 # for creating multiple orders
 from django.forms import inlineformset_factory
 
+# ordering filters
+from .filters import OrderFilter
+
 # Create your views here.
 
 def home(request):
@@ -40,10 +43,14 @@ def customer(request, pk_test):
     orders = customer.order_set.all().order_by('-id')
     total_orders = orders.count()
 
+    myFilter = OrderFilter(request.GET, queryset=orders)
+    orders = myFilter.qs
+
     context = {
                 'customer': customer,
                 'orders': orders,
                 'total_orders': total_orders,
+                'myFilter': myFilter,
             }
     return render(request, 'accounts/customer.html', context)
 
