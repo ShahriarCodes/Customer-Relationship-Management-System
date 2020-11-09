@@ -12,6 +12,14 @@ from .filters import OrderFilter
 
 # Create your views here.
 
+def registerPage(request):
+    context = {}
+    return render(request, 'accounts/register.html', context)
+
+def loginPage(request):
+    context = {}
+    return render(request, 'accounts/login.html', context)
+
 def home(request):
     orders = Order.objects.all().order_by('-id')
     customers = Customer.objects.all().order_by('-id')
