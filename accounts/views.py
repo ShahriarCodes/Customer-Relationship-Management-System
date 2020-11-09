@@ -1,19 +1,24 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.forms import inlineformset_factory # for creating multiple orders
+from django.contrib.auth.forms import UserCreationForm
+
 from .models import *
-
-from .forms import OrderForm, CustomerForm, ProductForm
-
-# for creating multiple orders
-from django.forms import inlineformset_factory
-
-# ordering filters
-from .filters import OrderFilter
+from .filters import OrderFilter # ordering filters
+from .forms import OrderForm, CustomerForm, ProductForm, CreateUserForm
 
 # Create your views here.
 
 def registerPage(request):
-    context = {}
+    form = CreateUserForm()
+
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form': form}
     return render(request, 'accounts/register.html', context)
 
 def loginPage(request):
