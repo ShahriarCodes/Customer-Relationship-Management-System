@@ -11,6 +11,7 @@ from .models import *
 from .filters import OrderFilter # ordering filters
 from .forms import OrderForm, CustomerForm, ProductForm, CreateUserForm
 
+from .decorators import unauthenticated_user
 # Create your views here.
 
 def registerPage(request):
@@ -30,22 +31,25 @@ def registerPage(request):
         context = {'form': form}
         return render(request, 'accounts/register.html', context)
 
+
+# used from decorators.py
+@unauthenticated_user
 def loginPage(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    else:
-        if request.method == 'POST':
-            username = request.POST.get('username')
-            password = request.POST.get('password')
+    # if request.user.is_authenticated:
+    #     return redirect('dashboard')
+    # else:
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-            user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username, password=password)
 
-            if user is not None:
-                login(request, user)
-                return redirect('/')
-            else:
-                messages.info(request, 'Username or Password is incorrect!')
-                # return render(request, 'accounts/login.html', context)
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            messages.info(request, 'Username or Password is incorrect!')
+            # return render(request, 'accounts/login.html', context)
 
         context = {}
         return render(request, 'accounts/login.html', context)
@@ -53,6 +57,10 @@ def loginPage(request):
 def logoutUser(request):
     logout(request)
     return redirect('/login/')
+
+def userPage(request):
+    context = {}
+    return render(request, 'accounts/user.html', context)
 
 
 @login_required(login_url='login')
