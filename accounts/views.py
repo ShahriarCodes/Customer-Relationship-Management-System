@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.forms import inlineformset_factory # for creating multiple orders
 from django.contrib.auth.forms import UserCreationForm
+
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import Group
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -11,28 +13,33 @@ from .models import *
 from .filters import OrderFilter # ordering filters
 from .forms import OrderForm, CustomerForm, ProductForm, CreateUserForm
 
-from .decorators import unauthenticated_user
+from .decorators import unauthenticated_user, allowed_users, admin_only
 # Create your views here.
 
+
+@unauthenticated_user
 def registerPage(request):
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    else:
+    # if request.user.is_authenticated:
+    #     return redirect('dashboard')
+    # else:
         form = CreateUserForm()
 
         if request.method == 'POST':
             form = CreateUserForm(request.POST)
             if form.is_valid():
-                form.save()
-                user = form.cleaned_data.get('username')
-                messages.success(request, 'Account was created for ' + user)
-                return redirect('/login/')
+                user = form.save()
+                username = form.cleaned_data.get('username')
+
+                group = Group.objects.get(name= 'customer')
+                user.groups.add(group)
+
+                messages.success(request, 'Account was created for ' + username)
+                return redirect('login')
 
         context = {'form': form}
         return render(request, 'accounts/register.html', context)
 
 
-# used from decorators.py
 @unauthenticated_user
 def loginPage(request):
     # if request.user.is_authenticated:
@@ -46,7 +53,7 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('/')
+            return redirect('dashboard')
         else:
             messages.info(request, 'Username or Password is incorrect!')
             # return render(request, 'accounts/login.html', context)
@@ -56,14 +63,11 @@ def loginPage(request):
 
 def logoutUser(request):
     logout(request)
-    return redirect('/login/')
-
-def userPage(request):
-    context = {}
-    return render(request, 'accounts/user.html', context)
+    return redirect('login')
 
 
 @login_required(login_url='login')
+@admin_only
 def home(request):
     orders = Order.objects.all().order_by('-id')
     customers = Customer.objects.all().order_by('-id')
@@ -84,7 +88,13 @@ def home(request):
     return render(request, 'accounts/dashboard.html', context)
 
 
+def userPage(request):
+    context = {}
+    return render(request, 'accounts/user.html', context)
+
+
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def products(request):
     products = Product.objects.all()
 
@@ -93,6 +103,7 @@ def products(request):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def customer(request, pk_test):
     customer = Customer.objects.get(id=pk_test)
 
@@ -112,6 +123,7 @@ def customer(request, pk_test):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def createOrder(request):
     form = OrderForm()
 
@@ -127,6 +139,7 @@ def createOrder(request):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def createOrderById(request, pk):
     # use 'extra' for as many fields as required
     OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=5)
@@ -154,6 +167,7 @@ def createOrderById(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def updateOrder(request, pk):
     order = Order.objects.get(id=pk)
     form = OrderForm(instance=order)
@@ -170,6 +184,7 @@ def updateOrder(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
 
@@ -188,6 +203,7 @@ def deleteOrder(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def createCustomer(request):
     form = CustomerForm()
 
@@ -203,6 +219,7 @@ def createCustomer(request):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def updateCustomer(request, pk):
     customer = Customer.objects.get(id=pk)
     form = CustomerForm(instance=customer)
@@ -219,6 +236,7 @@ def updateCustomer(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['admin'])
 def createProduct(request):
     form = ProductForm()
 
