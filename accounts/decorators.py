@@ -6,9 +6,8 @@ def unauthenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('/')
-        elif not request.user.is_authenticated:
+        else:
             return view_func(request, *args, **kwargs)
-        else: return HttpResponse('login/')
     return wrapper_func
 
 def allowed_users(allowed_roles=[]):
@@ -37,7 +36,7 @@ def admin_only(view_func):
         if group == 'admin':
             return view_func(request, *args, **kwargs)
 
-        elif  group == 'customer':
+        elif group == 'customer':
             return redirect('user-page')
 
         else:

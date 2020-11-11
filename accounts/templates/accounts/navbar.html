@@ -15,13 +15,15 @@
   <span id="hello-msg">Hello, {{ request.user }}</span>
   <span><a id="hello-msg" href="{% url 'logout' %}">Logout</a></span>
 
+
+  {% if request.user.is_staff %}
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto">
-      {% if request.user.is_stuff %}
+
       <li class="nav-item active">
         <a class="nav-link" href={% url 'dashboard' %}>Dashboard</a>
       </li>
@@ -31,8 +33,9 @@
       <li class="nav-item">
         <a class="nav-link" href='#'>Customer</a>
       </li>
-      {% endif %}
+
     </ul>
   </div>
+  {% endif %}
 
   </nav>
