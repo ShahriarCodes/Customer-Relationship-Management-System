@@ -13,6 +13,8 @@ class CustomerForm(ModelForm):
     class Meta:
         model = Customer
         fields = '__all__'
+        exclude = ['user'] #customer will not be able to update user field
+
 
 class ProductForm(ModelForm):
     class Meta:
