@@ -30,14 +30,17 @@ def registerPage(request):
                 user = form.save()
                 username = form.cleaned_data.get('username')
 
-                group = Group.objects.get(name= 'customer')
-                user.groups.add(group)
+                # moved to signals ---------
+                # group = Group.objects.get(name= 'customer')
+                # user.groups.add(group)
 
                 #Added username after video because of error returning customer name if not added
-                Customer.objects.create(
-                        user = user,
-                        name=user.username,
-                )
+                # Customer.objects.create(
+                #         user = user,
+                #         name=user.username,
+                # )
+                # moved to signals ---------
+
 
                 messages.success(request, 'Account was created for ' + username)
                 return redirect('login')
